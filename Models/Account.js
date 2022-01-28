@@ -37,23 +37,17 @@ class Account {
 
       if (walleticBalance >= amount) {
         // deduct money from walletic account
-        walleticBalance = walleticBalance - amount;
+        // walleticBalance = walleticBalance - amount;
         await connection.execute(
-          `UPDATE account SET balance = ? WHERE account_id = ?`,
-          [walleticBalance, account_id]
+          `UPDATE account SET balance = balance - ? WHERE account_id = ?`,
+          [amount, account_id]
         );
 
         // deposite money into bank
-        let [bank_account, fields] = await connection.execute(
-          `SELECT * FROM banks WHERE bank_account_id = ?`,
-          [bank_account_id]
-        );
-        // console.log(bank_account);
-        let bank_account_balance = bank_account[0]?.balance;
-        bank_account_balance = bank_account_balance + amount;
+
         await connection.execute(
-          `UPDATE banks SET balance = ? WHERE bank_account_id = ?`,
-          [bank_account_balance, bank_account_id]
+          `UPDATE banks SET balance = balance + ? WHERE bank_account_id = ?`,
+          [amount, bank_account_id]
         );
 
         await connection.execute(
@@ -81,9 +75,56 @@ class Account {
     }
   };
 
+  static deposite = async (account_id, amount, bank_account_id) => {
+    const connection = await mysql.createConnection(config);
+    await connection.execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE");
+    await connection.beginTransaction();
+    console.log(account_id);
+
+    try {
+      // it will check does the bank account exists or not
+      await Account.isBankAccountExists(bank_account_id);
+      // it will check does the walletic account exist or not
+      await Account.isWalleticAccountExist(account_id);
+
+      await connection.execute(
+        "UPDATE account SET balance = balance + ? WHERE account_id = ?",
+        [amount, account_id]
+      );
+
+      const [bankRecord, fields] = await connection.execute(
+        "SELECT * FROM banks WHERE bank_account_id = ?",
+        [bank_account_id]
+      );
+      const bankBalance = bankRecord[0]?.balance;
+      if (bankBalance >= amount) {
+        await connection.execute(
+          "UPDATE banks SET balance = balance - ? WHERE bank_account_id = ?",
+          [amount, bank_account_id]
+        );
+
+        await connection.execute(
+          `INSERT INTO transaction(typeOfTransaction, amount, walletic_account_id, bank_account_id_fk)
+        VALUES(?, ? , ?, ?)`,
+          ["deposit", amount, account_id, bank_account_id]
+        );
+        await connection.commit();
+        await connection.end();
+      } else {
+        await connection.rollback();
+        await connection.end();
+        throw new Error("Unsufficient bank balance for this transaction");
+      }
+    } catch (err) {
+      await connection.rollback();
+      await connection.end();
+      throw new Error(err);
+    }
+  };
+
   static isBankAccountExists = async (bank_account_id) => {
     const [bank_account, fields] = await db.execute(
-      `SELECT * FROM bank WHERE bank_account_id = ?`,
+      `SELECT * FROM banks WHERE bank_account_id = ?`,
       [bank_account_id]
     );
     if (bank_account.length < 1) {

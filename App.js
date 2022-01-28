@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+
 const bodyParser = require("body-parser");
 const accountRoutes = require("./Routes/Account");
 const authRoutes = require("./Routes/Auth");
@@ -30,10 +31,24 @@ app.use((req, res, next) => {
 });
 
 // console.log(conn);
-app.listen(process.env.PORT || 3000, () => {
-  console.log("server is running on port 3000");
-});
+let server;
 
-// app.listen(process.env.PORT || 3000, () => {
-//   console.log("server is working!");
-// });
+server = app.listen(process.env.PORT || 3000, () => {
+  // console.log("server is running on port 3000");
+  let io = require("./socket/socket").init(server); // intialize socket
+  io.on("connection", (socket) => {
+    // open a connection
+    console.log("client is connected!");
+    console.log(socket.id);
+    socket.on("user_id", (data) => {
+      // recive id from client
+      const result = require("./socket/activeClient").activeClients(
+        // manage state for the connected sockets
+        data,
+        socket.id
+      );
+      console.log(result);
+    });
+    // socket.emit("data", { balance: 2000 });
+  });
+});
