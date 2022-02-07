@@ -13,10 +13,10 @@ app.get("/", (req, res, next) => {
   res.json({ message: "Your api's are working correctly!" });
 });
 
-app.post("/", auth, (req, res, next) => {
-  console.log(req.user);
-  res.json({ message: "your apis are up!" });
-});
+// app.post("/", auth, (req, res, next) => {
+//   console.log(req.user);
+//   res.json({ message: "your apis are up!" });
+// });
 
 app.use("/api/auth", authRoutes);
 app.use("/api/account", accountRoutes);
