@@ -4,9 +4,11 @@ const app = express();
 const bodyParser = require("body-parser");
 const accountRoutes = require("./Routes/Account");
 const authRoutes = require("./Routes/Auth");
+const cors = require("cors");
 // const connection = require("./DB/connection");
 const auth = require("./Middleware/Authorization");
 
+app.use(cors());
 app.use(bodyParser.json());
 
 app.get("/", (req, res, next) => {
@@ -34,14 +36,12 @@ app.use((req, res, next) => {
 let server;
 
 server = app.listen(process.env.PORT || 3000, () => {
-  // console.log("server is running on port 3000");
   let io = require("./socket/socket").init(server); // intialize socket
+  // open a connection
   io.on("connection", (socket) => {
-    // open a connection
-    console.log("client is connected!");
-    console.log(socket.id);
     socket.on("user_id", (data) => {
-      // recive id from client
+      // recive user_id from client
+
       const result = require("./socket/activeClient").activeClients(
         // manage state for the connected sockets
         data,
@@ -49,6 +49,13 @@ server = app.listen(process.env.PORT || 3000, () => {
       );
       console.log(result);
     });
+    socket.on("disconnect", (reason) => {
+      // ...
+      console.log(socket.id, "socket_id");
+      const clients = require("./socket/activeClient").deleteClients(socket.id);
+      console.log(clients);
+    });
+
     // socket.emit("data", { balance: 2000 });
   });
 });

@@ -17,4 +17,11 @@ module.exports = {
     }
     return val;
   },
+  deleteClients: (socket_id)=> {
+    const filteredClients = clients.filter((client) => {
+      return client.socket_id != socket_id
+    })
+    clients = filteredClients;
+    return clients
+  }
 };
