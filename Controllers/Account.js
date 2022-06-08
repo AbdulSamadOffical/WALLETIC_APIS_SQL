@@ -5,10 +5,10 @@ const res = require("express/lib/response");
 module.exports.accountInfo = async (req, res, next) => {
   const id = req.params.id;
   const result = parseInt(id);
-  console.log(result, "result");
+  
 
-  if (result != "number") {
-    // console.log(typeof result);
+  if (typeof result != 'number') {
+    
     return res.json({ error: "pass a valid request params in url" });
   }
   const [row, fields] = await Account.userAccountInfo(id);
