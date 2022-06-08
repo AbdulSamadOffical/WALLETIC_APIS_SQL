@@ -53,7 +53,7 @@ server = app.listen(process.env.PORT || 3000, () => {
       // ...
       console.log(socket.id, "socket_id");
       const clients = require("./socket/activeClient").deleteClients(socket.id);
-      console.log(clients);
+      // console.log(clients);
     });
 
     // socket.emit("data", { balance: 2000 });
