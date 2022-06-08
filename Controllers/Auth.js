@@ -42,7 +42,7 @@ module.exports.verifyPhone = (req, res, next) => {
 
 //verify code
 module.exports.verifyCode = (req, res, next) => {
-  console.log("reached");
+
   const phoneNo = req?.body?.phoneNo;
   const code = req?.body?.code;
   const errors = validationResult(req);
