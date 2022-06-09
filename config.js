@@ -1,8 +1,8 @@
 module.exports = {
-  host: "localhost",
-  user: "root",
-  database: "walletic",
-  password: "karachi123",
+  host: process.env.HOST,
+  user: process.env.NAME,
+  database: process.env.NAME,
+  password: process.env.PASSWORD,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
