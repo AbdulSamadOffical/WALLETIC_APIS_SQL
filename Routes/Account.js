@@ -2,7 +2,8 @@ const express = require("express");
 const { body } = require("express-validator");
 const router = express.Router();
 const accountController = require("../Controllers/Account");
-router.get("/user/:id", accountController.accountInfo);
+const auth = require('../Middleware/Authorization')
+router.post("/user/:id", auth,accountController.accountInfo);
 router.post(
   "/withdraw",
   body("account_id")

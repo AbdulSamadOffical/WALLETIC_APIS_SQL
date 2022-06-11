@@ -2,6 +2,7 @@ const Account = require("../Models/Account");
 const db = require("../DB/connection");
 const { validationResult } = require("express-validator");
 const res = require("express/lib/response");
+
 module.exports.accountInfo = async (req, res, next) => {
   const id = req.params.id;
   const result = parseInt(id);
