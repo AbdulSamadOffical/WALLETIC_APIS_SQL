@@ -2,6 +2,7 @@ const Account = require("../Models/Account");
 const db = require("../DB/connection");
 const { validationResult } = require("express-validator");
 const res = require("express/lib/response");
+const { reservationsUrl } = require("twilio/lib/jwt/taskrouter/util");
 
 module.exports.accountInfo = async (req, res, next) => {
   const id = req.params.id;
@@ -95,7 +96,7 @@ module.exports.bankTrxHistoryController = async(req, res) => {
   res.status(200).json(transaction);
 }
 
-module.exports.accountVerifyController = async(req, tes) => {
+module.exports.accountVerifyController = async(req, res) => {
   const queryRes = await Account.userAccountInfo(req.params.user_id);
     if(queryRes.length == 0) {
       res.status(400).json({message: "user not found"});
@@ -108,11 +109,21 @@ module.exports.qrTrxController = async (req, res) => {
   const data = req.body.data
   try{
   const trxRes = await Account.qrTransactionModel(data.reciever_id, data.sender_id, data.amount);
-  res.status(200).json({message: "success", data: trxRes});
+  console.log(data.reciever_id, data.sender_id, data.amount);
+  res.status(200).json({message: "success", data: trxRes, status: 200});
 } 
   catch(err) {
-    res.status(400).json({message: err.message});
+    res.status(400).json({message: err.message, status: 400});
   }
-  
+}
+
+module.exports.userVerifyController = async(req, res) => {
+  const phoneNo = req.params.phoneNo;
+  const userData = await Account.user_verify(phoneNo);
+  if(userData[0].length > 0) {
+    res.status(200).json({message: "success", data: userData[0][0]})
+  } else {
+    res.status(400).json({message: "user doesnot exist"})
+  };
 }
 

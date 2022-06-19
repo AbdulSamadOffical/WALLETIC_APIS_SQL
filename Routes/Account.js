@@ -48,9 +48,11 @@ router.post(
   accountController.deposit
 );
 
+
 router.post("/walleticToWalletic", accountController.qrTrxController) // continue from this
 
-router.get("/userVerify/:user_id", accountController.accountVerifyController)
+// verify user for form transaction
+router.get("/userVerify/:phoneNo", accountController.userVerifyController);
 // router.get()
 router.get("/bank", accountController.bank);
 router.get("/account", accountController.account);

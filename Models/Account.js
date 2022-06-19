@@ -85,6 +85,11 @@ class Account {
     return db.execute(sql, [user_id]);
   }
 
+  static async user_verify(phoneNo) {
+    let sql = "SELECT phoneNo, fullname, a.account_id from user as u join account as a on u.user_id = a.user_id_fk where u.phoneNo = ?";
+    return db.execute(sql, [phoneNo])
+  }
+
   static withdraw = async (account_id, amount, bank_account_id) => {
     const connection = await mysql.createConnection(config);
     await connection.execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE");
