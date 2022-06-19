@@ -48,7 +48,13 @@ router.post(
   accountController.deposit
 );
 
+router.post("/walleticToWalletic", accountController.qrTrxController) // continue from this
+
+router.get("/userVerify/:user_id", accountController.accountVerifyController)
+// router.get()
 router.get("/bank", accountController.bank);
 router.get("/account", accountController.account);
 router.get("/transaction", accountController.transaction);
+router.get("/p2phistory/:user_id", accountController.p2pHistoryController);
+router.get("/bankhistory/:user_id", accountController.bankTrxHistoryController)
 module.exports = router;
