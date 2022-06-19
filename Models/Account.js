@@ -1,6 +1,7 @@
 const db = require("../DB/connection");
 const mysql = require("mysql2/promise"); // creating manual connection connections due to transactions
 const config = require("../config");
+const res = require("express/lib/response");
 // console.log(config);
 class Account {
   constructor(user_id, balance) {
@@ -12,6 +13,71 @@ class Account {
     let sql = "INSERT INTO account(user_id_fk, balance) VALUES (?,?)";
     return db.execute(sql, [this.user_id, this.balance]);
   }
+
+  static async p2pHistory(user_id) {
+    let query = "Select * from user as u join p2ptransaction as p2p on u.user_id = p2p.sender_id || u.user_id = p2p.reciver_id where u.user_id = ?"
+    let queryRes = await db.execute(query, [user_id]) 
+    return query[0];
+  }
+
+  static async bankTrxHistory(user_id) {
+    let query =  "select * from transaction as t join banks as b on t.bank_account_id_fk = b.bank_account_id where t.walletic_account_id = ?"
+    let queryRes = await db.execute(query, [user_id]) 
+    return queryRes[0] ;
+  }
+
+
+  static async qrTransactionModel(reciever_id, sender_id, invoiceAmt) {
+    const connection = await mysql.createConnection(config);
+    await connection.execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE");
+    await connection.beginTransaction();
+
+    try{
+      await Account.isWalleticAccountExist(reciever_id)
+      await Account.isWalleticAccountExist(sender_id);
+
+      const res = await connection.execute(
+        "SELECT * FROM account WHERE account_id = ?",
+        [sender_id]
+      );
+      console.log(res[0][0])
+
+      if(res[0][0].balance < invoiceAmt) {
+         throw new Error("balance insufficient"); 
+      }
+
+      await connection.execute(
+        `UPDATE account SET balance = balance - ? WHERE account_id = ?`,
+        [invoiceAmt, sender_id]
+      );
+
+      await connection.execute(
+        `UPDATE account SET balance = balance + ? WHERE account_id = ?`,
+        [invoiceAmt, reciever_id]
+      );
+
+      await connection.execute(
+        `INSERT INTO p2ptransaction( amount, sender_id, reciver_id)
+      VALUES( ? , ?, ?)`,
+        [invoiceAmt, sender_id, reciever_id]
+      );
+
+      await connection.commit();
+
+      await connection.end();
+
+      return "success";
+    
+    } catch(err) {
+      await connection.rollback();
+      console.log("Rollback Successfull");
+      console.log(err.message)
+      // close the connection
+      await connection.end();
+      throw new Error(err.message);
+    }
+  }
+
 
   static userAccountInfo(user_id) {
     let sql =

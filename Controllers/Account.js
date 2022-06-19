@@ -81,3 +81,38 @@ module.exports.transaction = async (req, res) => {
   const [transaction, fields] = await db.execute("SELECT * FROM transaction");
   res.json(transaction);
 };
+
+// error handling is not done
+module.exports.p2pHistoryController = async(req, res) => {
+  const p2pHistory = await Account.p2pHistory(req.params.user_id)
+  res.status(200).json(p2pHistory);
+}
+
+// error handling is not done
+module.exports.bankTrxHistoryController = async(req, res) => {
+  const transaction = await Account.bankTrxHistory(req.params.user_id);
+  console.log(transaction);
+  res.status(200).json(transaction);
+}
+
+module.exports.accountVerifyController = async(req, tes) => {
+  const queryRes = await Account.userAccountInfo(req.params.user_id);
+    if(queryRes.length == 0) {
+      res.status(400).json({message: "user not found"});
+    } else {
+      res.status(200).json({message: "user exist", data: queryRes});
+  }
+}
+
+module.exports.qrTrxController = async (req, res) => {
+  const data = req.body.data
+  try{
+  const trxRes = await Account.qrTransactionModel(data.reciever_id, data.sender_id, data.amount);
+  res.status(200).json({message: "success", data: trxRes});
+} 
+  catch(err) {
+    res.status(400).json({message: err.message});
+  }
+  
+}
+
