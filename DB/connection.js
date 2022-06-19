@@ -9,14 +9,23 @@ const mysql = require("mysql2");
 // Create the connection pool. The pool-specific settings are the defaults
 
 const pool = mysql.createPool({
-  host: process.env.HOST,
-  user: process.env.NAME,
-  database: process.env.NAME,
-  password: process.env.PASSWORD,
+  // host: process.env.HOST,
+  // user: process.env.NAME,
+  // database: process.env.NAME,
+  // password: process.env.PASSWORD,
+  host:'localhost',
+  user: 'root',
+  database:'walletic',
+  password: 'karachi123',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
+
 });
 
+pool.getConnection(function(err, conn) {
+  
+console.log(err)
 
+})
 module.exports = pool.promise();
