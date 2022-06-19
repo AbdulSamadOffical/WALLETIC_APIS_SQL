@@ -29,7 +29,7 @@ module.exports.withdraw = async (req, res, next) => {
   const walleticAccountNo = req.body.account_id;
   const bankAccountNo = req.body.bank_account_id;
   const amount = req.body.amount;
-  let userid = 2;
+  let userid = 1;
   try {
    await Account.withdraw(walleticAccountNo, amount, bankAccountNo);
     let io = require("../socket/socket").getIo();
@@ -105,9 +105,16 @@ module.exports.accountVerifyController = async(req, tes) => {
 }
 
 module.exports.qrTrxController = async (req, res) => {
+  const user_id = 1;
   const data = req.body.data
   try{
   const trxRes = await Account.qrTransactionModel(data.reciever_id, data.sender_id, data.amount);
+  const [accountRecord, fields] = await Account.userAccountInfo(data.sender_id);
+  console.log(accountRecord, 'data')
+  let io = require("../socket/socket").getIo();
+  const socketInfo = require("../socket/activeClient").getClients(user_id); // get the info from the client
+  console.log(socketInfo);
+  io.to(socketInfo?.socket_id).emit("data", { balance: accountRecord[0]?.balance });
   res.status(200).json({message: "success", data: trxRes});
 } 
   catch(err) {
