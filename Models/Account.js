@@ -15,13 +15,13 @@ class Account {
   }
 
   static async p2pHistory(user_id) {
-    let query = "Select * from user as u join p2ptransaction as p2p on u.user_id = p2p.sender_id || u.user_id = p2p.reciver_id where u.user_id = ?"
+    let query = "Select * from user as u join p2ptransaction as p2p on u.user_id = p2p.sender_id || u.user_id = p2p.reciver_id where u.user_id = ? order by id desc"
     let queryRes = await db.execute(query, [user_id]) 
     return query[0];
   }
 
   static async bankTrxHistory(user_id) {
-    let query =  "select * from transaction as t join banks as b on t.bank_account_id_fk = b.bank_account_id where t.walletic_account_id = ?"
+    let query =  "select * from transaction as t join banks as b on t.bank_account_id_fk = b.bank_account_id where t.walletic_account_id = ? order by transaction_id desc"
     let queryRes = await db.execute(query, [user_id]) 
     return queryRes[0] ;
   }
