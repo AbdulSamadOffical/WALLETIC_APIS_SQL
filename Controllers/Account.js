@@ -57,7 +57,6 @@ module.exports.deposit = async (req, res, next) => {
   const bankAccountNo = req.body.bank_account_id;
   const amount = req.body.amount;
 
-  // io.to(socket.id).emit("event", data);
 
   try {
     await Account.deposite(walleticAccountNo, amount, bankAccountNo);
@@ -83,17 +82,24 @@ module.exports.transaction = async (req, res) => {
   res.json(transaction);
 };
 
-// error handling is not done
+//  wallet to wallect transaction
 module.exports.p2pHistoryController = async(req, res) => {
-  const p2pHistory = await Account.p2pHistory(req.params.user_id)
-  res.status(200).json(p2pHistory);
+  try {
+    const p2pHistory = await Account.p2pHistory(req.params.user_id)
+    res.status(200).json(p2pHistory);
+  } catch(err) {
+    res.status(400).send(err.message);
+  }
 }
 
-// error handling is not done
+// bank to wallet transaction
 module.exports.bankTrxHistoryController = async(req, res) => {
-  const transaction = await Account.bankTrxHistory(req.params.user_id);
-  console.log(transaction);
-  res.status(200).json(transaction);
+  try {
+    const transaction = await Account.bankTrxHistory(req.params.user_id);
+    res.status(200).json(transaction);
+  } catch(err) {
+    res.status(400).send(err.message);
+  }
 }
 
 module.exports.accountVerifyController = async(req, res) => {
