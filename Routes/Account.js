@@ -40,8 +40,6 @@ router.post(
     .custom((value) => {
       if (value > 500 || value < 1) {
         return Promise.reject("Minimum transaction amount is 500 Rs");
-      } else if (typeof value != "number") {
-        return Promise.reject("Amount should be in integer type");
       }
       return true;
     }),

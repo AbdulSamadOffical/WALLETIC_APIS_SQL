@@ -57,7 +57,7 @@ module.exports.deposit = async (req, res, next) => {
   const bankAccountNo = req.body.bank_account_id;
   const amount = req.body.amount;
 
-  io.to(socket.id).emit("event", data);
+  // io.to(socket.id).emit("event", data);
 
   try {
     await Account.deposite(walleticAccountNo, amount, bankAccountNo);
