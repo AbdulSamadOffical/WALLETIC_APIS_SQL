@@ -126,10 +126,26 @@ class Account {
         VALUES(?, ? , ?, ?)`,
           ["withdraw", amount, account_id, bank_account_id]
         );
+        const [reciverBalance, field] = await connection.execute(
+          "SELECT balance FROM banks WHERE bank_account_id = ?",
+          [bank_account_id]
+        );
+        const [senderBalance, fields] = await connection.execute(
+          "SELECT balance FROM account WHERE user_id_fk = ?",
+          [account_id]
+        );
+
+
+        const balances = {
+          walleticBalance: senderBalance[0],
+          bankBalance: reciverBalance[0]
+        }
+        
         await connection.commit();
         console.log("Transaction completed Successfully!");
         // close the connection
         await connection.end();
+        return balances;
       } else {
         await connection.rollback();
         console.log("Rollback Successfull");
