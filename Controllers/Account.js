@@ -33,12 +33,11 @@ module.exports.withdraw = async (req, res, next) => {
   let userid = 1;
   try {
    const balances = await Account.withdraw(walleticAccountNo, amount, bankAccountNo);
-    // let io = require("../socket/socket").getIo();
-    // const socketInfo = require("../socket/activeClient").getClients(walleticAccountNo); // get the info from the client
-    // console.log(socketInfo);
-    // io.to(socketInfo?.socket_id).emit("data", { balance: balances.walleticBalance.balance }); // send the message to specfic user
-   // pushing data to frontend
+   //data pusher for sender 
     pusher(walleticAccountNo,balances?.walleticBalance?.balance )
+    // data pusher for reciever
+
+    pusher(bankAccountNo, balances?.bankBalance?.balance)
     res.status(200).json({ message: "Transaction sucessfull" });
   } catch (err) {
     console.log("This transaction is failed!");
