@@ -17,7 +17,7 @@ class Account {
   static async p2pHistory(user_id) {
     let query = "Select * from user as u join p2ptransaction as p2p on u.user_id = p2p.sender_id || u.user_id = p2p.reciver_id where u.user_id = ? order by id desc"
     let queryRes = await db.execute(query, [user_id]) 
-    return query[0];
+    return query;
   }
 
   static async bankTrxHistory(user_id) {
