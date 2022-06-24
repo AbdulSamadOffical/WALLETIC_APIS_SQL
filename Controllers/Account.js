@@ -2,7 +2,7 @@ const Account = require("../Models/Account");
 const db = require("../DB/connection");
 const { validationResult } = require("express-validator");
 const res = require("express/lib/response");
-const { reservationsUrl } = require("twilio/lib/jwt/taskrouter/util");
+const pusher = require('../socket/pusher');
 
 module.exports.accountInfo = async (req, res, next) => {
   const id = req.params.id;
@@ -33,10 +33,12 @@ module.exports.withdraw = async (req, res, next) => {
   let userid = 1;
   try {
    const balances = await Account.withdraw(walleticAccountNo, amount, bankAccountNo);
-    let io = require("../socket/socket").getIo();
-    const socketInfo = require("../socket/activeClient").getClients(walleticAccountNo); // get the info from the client
-    console.log(socketInfo);
-    io.to(socketInfo?.socket_id).emit("data", { balance: balances.walleticBalance.balance }); // send the message to specfic user
+    // let io = require("../socket/socket").getIo();
+    // const socketInfo = require("../socket/activeClient").getClients(walleticAccountNo); // get the info from the client
+    // console.log(socketInfo);
+    // io.to(socketInfo?.socket_id).emit("data", { balance: balances.walleticBalance.balance }); // send the message to specfic user
+   // pushing data to frontend
+    pusher(walleticAccountNo,balances?.walleticBalance?.balance )
     res.status(200).json({ message: "Transaction sucessfull" });
   } catch (err) {
     console.log("This transaction is failed!");
