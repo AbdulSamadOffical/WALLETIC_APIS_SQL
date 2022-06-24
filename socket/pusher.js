@@ -10,4 +10,3 @@ function pusher(user_id, balance){
 module.exports = pusher;
 
 
-// balances.walleticBalance.balance

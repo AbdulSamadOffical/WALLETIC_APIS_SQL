@@ -62,11 +62,23 @@ class Account {
         [invoiceAmt, sender_id, reciever_id]
       );
 
+      const [reciverBalance, field] = await connection.execute(
+        "SELECT balance FROM account WHERE user_id_fk = ?",
+        [reciever_id]
+      );
+      const [senderBalance, fields] = await connection.execute(
+        "SELECT balance FROM account WHERE user_id_fk = ?",
+        [sender_id]
+      );
+      const balances = {
+        walleticBalance_sender: senderBalance[0],
+        walleticBalance_reciver: reciverBalance[0]
+      }
       await connection.commit();
 
       await connection.end();
 
-      return "success";
+      return balances;
     
     } catch(err) {
       await connection.rollback();
@@ -195,6 +207,11 @@ class Account {
         VALUES(?, ? , ?, ?)`,
           ["deposit", amount, account_id, bank_account_id]
         );
+
+
+
+
+
         await connection.commit();
         await connection.end();
       } else {

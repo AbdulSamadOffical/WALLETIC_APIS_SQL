@@ -116,14 +116,19 @@ module.exports.qrTrxController = async (req, res) => {
   const user_id = 1;
   const data = req.body.data
   try{
-  const trxRes = await Account.qrTransactionModel(data.reciever_id, data.sender_id, data.amount);
-  const [accountRecord, fields] = await Account.userAccountInfo(data.sender_id);
-  console.log(accountRecord, 'data')
-  let io = require("../socket/socket").getIo();
-  const socketInfo = require("../socket/activeClient").getClients(user_id); // get the info from the client
-  console.log(socketInfo);
-  io.to(socketInfo?.socket_id).emit("data", { balance: accountRecord[0]?.balance });
-  res.status(200).json({message: "success", data: trxRes});
+  const balances = await Account.qrTransactionModel(data.reciever_id, data.sender_id, data.amount);
+  // const [accountRecord, fields] = await Account.userAccountInfo(data.sender_id);
+  // console.log(accountRecord, 'data')
+  // let io = require("../socket/socket").getIo();
+  // const socketInfo = require("../socket/activeClient").getClients(user_id); // get the info from the client
+  // console.log(socketInfo);
+  // io.to(socketInfo?.socket_id).emit("data", { balance: accountRecord[0]?.balance });
+     //data pusher for sender 
+     pusher(data.reciever_id,balances?.reciverBalance?.balance )
+     // data pusher for sender
+ 
+     pusher(data.sender_id, balances?.walleticBalance_sender?.balance)
+  res.status(200).json({message: "success", data: "sucess"});
 } 
   catch(err) {
     res.status(400).json({message: err.message, status: 400});
