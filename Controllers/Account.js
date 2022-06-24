@@ -86,15 +86,19 @@ module.exports.transaction = async (req, res) => {
 module.exports.p2pHistoryController = async(req, res) => {
   try {
     const user_id = req.params.user_id;
-    const p2pHistory = await Account.p2pHistory(user_id);
+    let p2pHistory = await Account.p2pHistory(user_id);
 
     p2pHistory.forEach((trx) => {
       if(trx.sender_id == user_id) {
         trx.type = "send";
-      } else if(trx.reciever_id = user_id) {
+      } else if(trx.reciver_id = user_id) {
         trx.type = "recieve";
+      } else {
+        console.log("fake trx");
       }
     }) 
+
+  p2pHistory = p2pHistory.filter(trx => trx.sender_id != trx.reciver_id)
 
     res.status(200).json(p2pHistory);
   } catch(err) {
